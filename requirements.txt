@@ -1,4 +1,7 @@
+streamlit
+plotly
+pandas
 langchain
-langchain-core
 langchain-openai
+langchain-core
 openai
