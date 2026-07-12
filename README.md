@@ -140,6 +140,10 @@ streamlit run app.py
 
 ---
 
+> **Note:** This version currently generates emails using predefined templates. The application is designed to support integration with an LLM (such as OpenAI GPT) in a future version by configuring an API key.
+
+---
+
 # 👨‍💻 Author
 
 **Sumanth Kotian**
