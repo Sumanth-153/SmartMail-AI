@@ -1,0 +1,5 @@
+.streamlit/secrets.toml
+__pycache__/
+email_generator_backup.py
+.agents/
+email_history.txt

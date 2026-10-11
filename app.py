@@ -68,53 +68,59 @@ if page == "Generate Email":
     )
 
     purpose = st.text_input("Purpose of the Email")
-
     context = st.text_area("Context / Details")
 
     tone = st.selectbox(
         "Select Tone",
-        [
-            "formal",
-            "semi-formal",
-            "casual"
-        ]
+        ["formal", "semi-formal", "casual"]
     )
 
     generate = st.button("Generate Email")
 
     if generate:
 
-        email = generate_email(
-            email_type,
-            purpose,
-            context,
-            tone
-        )
+        if not purpose.strip():
+            st.warning("Please enter the purpose of your email.")
 
-        with open("email_history.txt", "a", encoding="utf-8") as f:
-            f.write(email)
-            f.write("\n")
-            f.write("=" * 50)
-            f.write("\n\n")
+        else:
+            email = generate_email(
+                email_type,
+                purpose,
+                context,
+                tone
+            )
 
-        st.success("Email saved to history!")
-        st.success("Email Generated Successfully!")
+            # Do not save failed API responses as generated emails
+            if email.startswith("Email generation failed:"):
+                st.error(email)
 
-        st.subheader("Generated Email")
+            else:
+                # Save the email type along with the generated email
+                with open("email_history.txt", "a", encoding="utf-8") as f:
+                    f.write(f"Email Type: {email_type}\n")
+                    f.write(email)
+                    f.write("\n")
+                    f.write("=" * 50)
+                    f.write("\n\n")
 
-        st.text_area(
-            "Output",
-            email,
-            height=300,
-            key="generated_email"
-        )
+                st.success("Email saved to history!")
+                st.success("Email generated successfully!")
 
-        st.download_button(
-            "📥 Download Email",
-            email,
-            file_name="generated_email.txt",
-            mime="text/plain"
-        )
+                st.subheader("Generated Email")
+
+                st.text_area(
+                    "Output",
+                    email,
+                    height=300,
+                    key="generated_email"
+                )
+
+                st.download_button(
+                    "📥 Download Email",
+                    email,
+                    file_name="generated_email.txt",
+                    mime="text/plain"
+                )
 
 
 # ==========================================
@@ -135,7 +141,16 @@ elif page == "Email History":
         history = ""
 
     emails = history.split("=" * 50)
-    emails = [email.strip() for email in emails if email.strip()]
+
+    emails = [
+    email.strip()
+    for email in emails
+    if email.strip()
+    and not email.strip().lower().startswith(
+        "email generation failed:"
+    )
+]
+
 
     df = pd.DataFrame({
         "Email": emails
@@ -189,97 +204,167 @@ elif page == "Email History":
 # Analytics Page
 # ==========================================
 
+
 elif page == "Analytics":
+    import os
+    import re
 
     st.header("📊 Email Analytics")
 
-    try:
-        with open("email_history.txt", "r", encoding="utf-8") as f:
-            history = f.read()
+    history_file = "email_history.txt"
 
+    try:
+        with open(history_file, "r", encoding="utf-8") as f:
+            history = f.read()
     except FileNotFoundError:
         history = ""
 
-    import os
-
     st.write("📂 Current Folder:", os.getcwd())
-    st.write("📄 History File:", os.path.abspath("email_history.txt"))
+    st.write("📄 History File:", os.path.abspath(history_file))
 
-    # Split history into individual emails
-    emails = history.split("=" * 50)
-    emails = [email.strip() for email in emails if email.strip()]
+    # Split history into individual email records
+    records = [
+        record.strip()
+        for record in history.split("=" * 50)
+        if record.strip()
+    ]
 
+    # Exclude failed API responses
+    emails = [
+        record for record in records
+        if not record.lower().startswith("email generation failed:")
+    ]
+
+    categories = {
+        "Job": 0,
+        "Follow Up": 0,
+        "Leave": 0,
+        "Meeting": 0,
+        "Apology": 0,
+        "Other / Unclassified": 0
+    }
+
+    category_map = {
+        "job_application": "Job",
+        "follow_up": "Follow Up",
+        "leave_request": "Leave",
+        "meeting_request": "Meeting",
+        "apology": "Apology"
+    }
+
+    # Classify each email exactly once
+    for email in emails:
+        category = None
+
+        # First, check saved email-type metadata
+        match = re.search(
+            r"email type:\s*([a-z_]+)",
+            email,
+            re.IGNORECASE
+        )
+
+        if match:
+            category = category_map.get(match.group(1).lower())
+
+        # For older emails without metadata, inspect the subject
+        if category is None:
+            subject_match = re.search(
+                r"subject:\s*(.+)",
+                email,
+                re.IGNORECASE
+            )
+
+            subject = (
+                subject_match.group(1).strip().lower()
+                if subject_match
+                else ""
+            )
+
+            if any(word in subject for word in [
+                "job application", "application for",
+                "applying for a job"
+            ]):
+                category = "Job"
+
+            elif any(word in subject for word in [
+                "follow up", "follow-up", "following up"
+            ]):
+                category = "Follow Up"
+
+            elif any(word in subject for word in [
+                "leave", "time off", "absence"
+            ]):
+                category = "Leave"
+
+            elif any(word in subject for word in [
+                "meeting", "schedule a call"
+            ]):
+                category = "Meeting"
+
+            elif any(word in subject for word in [
+                "apology", "apologize", "apologise", "sorry"
+            ]):
+                category = "Apology"
+
+        # Every email contributes to exactly one category
+        if category is None:
+            category = "Other / Unclassified"
+
+        categories[category] += 1
+
+    # Use one source of truth for both metrics and chart
     total = len(emails)
 
-    job = 0
-    follow = 0
-    leave = 0
-    meeting = 0
-    apology = 0
+    col1, col2, col3 = st.columns(3)
 
-    for email in emails:
+    col1.metric("📧 Total Emails", total)
+    col2.metric("💼 Jobs", categories["Job"])
+    col3.metric("🔄 Follow Ups", categories["Follow Up"])
 
-        text = email.lower()
+    col4, col5, col6 = st.columns(3)
 
-        if "job_application" in text:
-            job += 1
+    col4.metric("🏥 Leave", categories["Leave"])
+    col5.metric("🤝 Meetings", categories["Meeting"])
+    col6.metric("🙏 Apologies", categories["Apology"])
 
-        elif "follow_up" in text:
-            follow += 1
+    st.metric(
+        "📂 Other / Unclassified",
+        categories["Other / Unclassified"]
+    )
 
-        elif "leave_request" in text:
-            leave += 1
-
-        elif "meeting_request" in text:
-            meeting += 1
-
-        elif "apology" in text:
-            apology += 1
-
-    data = {
-        "Email Type": [
-            "Job",
-            "Follow Up",
-            "Leave",
-            "Meeting",
-            "Apology"
-        ],
-        "Count": [
-            job,
-            follow,
-            leave,
-            meeting,
-            apology
-        ]
-    }
+    # Build the chart from the exact same category counts
+    data = pd.DataFrame({
+        "Email Type": list(categories.keys()),
+        "Count": list(categories.values())
+    })
 
     fig = px.bar(
         data,
         x="Email Type",
         y="Count",
         color="Email Type",
-        title="SmartMail AI - Email Analytics"
+        title="SmartMail AI - Email Analytics",
+        text="Count"
     )
 
-    col1, col2, col3 = st.columns(3)
+    st.plotly_chart(fig, use_container_width=True)
 
-    col1.metric("📧 Total", total)
-    col2.metric("💼 Jobs", job)
-    col3.metric("🔄 Follow Up", follow)
+    # Verify that every email is accounted for
+    category_total = sum(categories.values())
 
-    col4, col5, col6 = st.columns(3)
-
-    col4.metric("🏥 Leave", leave)
-    col5.metric("🤝 Meetings", meeting)
-    col6.metric("🙏 Apologies", apology)
-
-    st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
+    if category_total == total:
+        st.success(
+            f"Verified: {category_total} emails accounted for "
+            "across all categories."
+        )
+    else:
+        st.error(
+            f"Count mismatch: total={total}, "
+            f"categories={category_total}"
+        )
 
     st.markdown("---")
-
     st.caption(
-        "🚀 SmartMail AI | Built by Sumanth Kotian using Python, Streamlit & Plotly"
+        "🚀 SmartMail AI | Built by Sumanth Kotian "
+        "using Python, Streamlit & Plotly"
     )
