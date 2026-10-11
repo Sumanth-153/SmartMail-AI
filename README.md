@@ -1,157 +1,128 @@
 # 📧 SmartMail AI
 
-An AI-inspired Email Assistant built using **Python**, **Streamlit**, **Pandas**, and **Plotly**.
+**SmartMail AI** is an AI-powered email assistant built with Python and Streamlit. It uses Google's Gemini API to generate professional emails based on the user's email type, purpose, context, and preferred tone.
 
-SmartMail AI allows users to generate professional email templates, manage email history, search previous emails, visualize analytics, and export history as CSV through an interactive web interface.
+The application also provides email history management, search, analytics, individual email downloads, and CSV export through an interactive web interface.
 
----
+## 🚀 Features
 
-# 🚀 Features
-
-- 📧 Generate professional emails
-- 💼 Multiple email types
+- 🤖 **AI-Powered Email Generation** using Google Gemini
+- 💼 **Multiple Email Types**
   - Job Application
   - Follow Up
   - Leave Request
   - Meeting Request
   - Apology
-- 🎨 Multiple tone options
-  - Formal
-  - Semi-formal
-  - Casual
-- 📜 Email History
-- 🔍 Search Previous Emails
-- 📊 Analytics Dashboard
-- 📈 Interactive Charts using Plotly
-- 📥 Download Generated Emails
-- 📂 Export Email History to CSV
-- 🌐 Responsive Streamlit Web Interface
+- 🎨 **Tone Selection:** Formal, Semi-formal, and Casual
+- 📜 **Email History** to view previously generated emails
+- 🔍 **Search History** to find relevant emails
+- 📊 **Analytics Dashboard** with category counts and interactive charts
+- 📥 **Download Generated Emails**
+- 📂 **Export Email History to CSV**
 
----
-
-# 🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 - Python
 - Streamlit
+- Google Gemini API (`google-genai`)
 - Pandas
 - Plotly
-- VS Code
+- Git and GitHub
 
----
+## 📸 Screenshots
 
-# 📸 Screenshots
+### 🏠 Dashboard
+![SmartMail AI Dashboard](assets/SmartMail%20AI%20Dashboard.png)
 
-## 🏠 Dashboard
-
-![Dashboard](assets/SmartMail%20AI%20Dashboard.png)
-
----
-
-## ✉️ Generate Email
-
+### ✉️ Generate Email
 ![Generate Email](assets/Generate%20Email.png)
 
----
+### 📜 Email History
+![Email History](assets/Email%20history.png)
 
-## 📜 Email History
+### 📊 Analytics Dashboard
+![Email Analytics](assets/Email%20Analytics.png)
 
-![History](assets/Email%20history.png)
+## 📂 Project Structure
 
----
-
-## 📊 Analytics
-
-![Analytics](assets/Email%20Analytics.png)
-
----
-
-# 📂 Project Structure
-
-```
+```text
 SmartMail-AI/
-│
 ├── assets/
-│   ├── SmartMail AI Dashboard.png
-│   ├── Generate Email.png
-│   ├── Email history.png
-│   └── Email Analytics.png
-│
+├── .streamlit/
+│   └── secrets.toml.example
 ├── app.py
 ├── email_generator.py
 ├── email_templates.py
 ├── email_templates.txt
-├── email_history.txt
 ├── requirements.txt
 └── README.md
 ```
 
----
+*Note: `email_history.txt`, `.streamlit/secrets.toml`, and other local or private files may not be included in the GitHub repository.*
 
-# ⚙️ Installation
+## ⚙️ Installation and Setup
 
-Clone the repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/SmartMail-AI.git
-```
-
-Go into the project folder
+### 1. Clone the repository
 
 ```bash
+git clone https://github.com/Sumanth-153/SmartMail-AI.git
 cd SmartMail-AI
 ```
 
-Install dependencies
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the application
+### 3. Configure your Gemini API key
 
-```bash
-streamlit run app.py
+Create a `.streamlit/secrets.toml` file in the project directory and add:
+
+```toml
+GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"
 ```
 
----
+Replace the placeholder with your own API key. **Never commit your actual API key to GitHub.**
 
-# 💻 How to Use
+### 4. Run the application
+
+```bash
+python -m streamlit run app.py
+```
+
+## 💻 How to Use
 
 1. Select an email type.
-2. Enter the purpose.
-3. Enter the email details.
-4. Select the desired tone.
-5. Click **Generate Email**.
-6. View, download, or save the generated email.
-7. Search previous emails in the Email History page.
-8. View statistics in the Analytics Dashboard.
+2. Enter the purpose and relevant context.
+3. Choose your preferred tone.
+4. Click **Generate Email**.
+5. Review and download the generated email.
+6. Browse or search previous emails.
+7. Explore email statistics in the Analytics Dashboard.
+8. Export email history as a CSV file.
 
----
+## 🌐 Live Demo
 
-# 🔮 Future Improvements
+Try SmartMail AI: https://smartmail-ai-sumanth.streamlit.app
 
-- 🤖 OpenAI API Integration
-- 🧠 LangChain Integration
-- 🌍 Multi-language Email Support
-- 📧 Gmail Integration
-- ☁️ Cloud Database
-- 🔐 User Authentication
-- 📱 Mobile Responsive Design
+## 🔮 Future Improvements
 
----
+- Gmail integration
+- Multi-language email generation
+- Cloud database for persistent history
+- User authentication
+- Additional customization options
 
-> **Note:** This version currently generates emails using predefined templates. The application is designed to support integration with an LLM (such as OpenAI GPT) in a future version by configuring an API key.
-
----
-
-# 👨‍💻 Author
+## 👨‍💻 Author
 
 **Sumanth Kotian**
 
-Engineering Student | Python Developer | AI Enthusiast
+Python Developer | AI Enthusiast | Business Analytics
 
----
+- GitHub: https://github.com/Sumanth-153
+- LinkedIn: https://www.linkedin.com/in/sumanth-kotian-620225338/
 
-# ⭐ Support
+## ⭐ Support
 
-If you like this project, consider giving it a ⭐ on GitHub.
+If you find this project useful, consider giving the repository a ⭐ on GitHub.
