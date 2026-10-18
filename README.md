@@ -31,18 +31,19 @@ The application also provides email history management, search, analytics, indiv
 
 ## 📸 Screenshots
 
+
 ### 🏠 Dashboard
-![SmartMail AI Dashboard](assets/SmartMail%20AI%20Dashboard.png)
+![SmartMail AI Dashboard](assets/SmartMail-AI-Dashboard.png)
 
 ### ✉️ Generate Email
-![Generate Email](assets/Generate%20Email.png)
+![Generate Email](assets/Generate-Email.png)
 
-### 📜 Email History
-![Email History](assets/Email%20history.png)
+### 🧾 Email History
+![Email History](assets/Email-history.png)
 
 ### 📊 Analytics Dashboard
-![Email Analytics](assets/Email%20Analytics.png)
-
+![Email Analytics](assets/Email-Analytics%201.png)
+![Email Analytics - Full Chart](assets/Email-Analytics%202.png)
 ## 📂 Project Structure
 
 ```text
