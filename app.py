@@ -19,23 +19,18 @@ st.sidebar.markdown("---")
 st.sidebar.header("ℹ️ About")
 
 st.sidebar.write("""
-SmartMail AI is an AI-powered email assistant built using:
+An AI-powered assistant for professional email writing.
 
-- Python
-- Streamlit
-- Plotly
-- Pandas
+**Features**
+- ✨ AI email generation
+- 🔎 Email history and search
+- 📊 Analytics dashboard
+- 📥 CSV export
 
-Features:
-
-✅ Generate Emails
-
-✅ Search History
-
-✅ Analytics Dashboard
-
-✅ Export CSV
+**Built with**
+Python · Streamlit · Gemini AI
 """)
+
 
 page = st.sidebar.radio(
     "Navigation",
@@ -47,80 +42,137 @@ page = st.sidebar.radio(
 )
 
 
+
+
+
 # ==========================================
 # Generate Email Page
 # ==========================================
 
 if page == "Generate Email":
 
-    st.title("📧 SmartMail AI")
-    st.subheader("AI-Powered Email Assistant")
+    with st.container(width=900):
+        st.title("📧 SmartMail AI")
+        st.subheader("AI-Powered Email Assistant")
 
-    email_type = st.selectbox(
-        "Select Email Type",
-        [
-            "job_application",
-            "follow_up",
-            "meeting_request",
-            "leave_request",
-            "apology"
-        ]
-    )
+        # User-friendly email type labels
+        email_type_options = {
+            "Job Application": "job_application",
+            "Follow-up Email": "follow_up",
+            "Meeting Request": "meeting_request",
+            "Leave Request": "leave_request",
+            "Apology Email": "apology",
+        }
 
-    purpose = st.text_input("Purpose of the Email")
-    context = st.text_area("Context / Details")
+        selected_email_type = st.selectbox(
+            "Select Email Type",
+            list(email_type_options.keys()),
+        )
 
-    tone = st.selectbox(
-        "Select Tone",
-        ["formal", "semi-formal", "casual"]
-    )
+        email_type = email_type_options[selected_email_type]
 
-    generate = st.button("Generate Email")
+        # Email purpose
+        purpose = st.text_input(
+            "Purpose of the Email",
+            placeholder="e.g., Apply for a Business Analyst position",
+        )
 
-    if generate:
+        # Additional context
+        context = st.text_area(
+            "Context / Details",
+            placeholder=(
+                "Add relevant details, experience, "
+                "recipient information, or key points..."
+            ),
+        )
 
-        if not purpose.strip():
-            st.warning("Please enter the purpose of your email.")
+        # Email tone
+        tone = st.selectbox(
+            "Select Tone",
+            ["formal", "semi-formal", "casual"],
+        )
 
-        else:
-            email = generate_email(
-                email_type,
-                purpose,
-                context,
-                tone
-            )
+        # Primary generate button
+        generate = st.button(
+            "✨ Generate Email",
+            type="primary",
+            use_container_width=True,
+        )
 
-            # Do not save failed API responses as generated emails
-            if email.startswith("Email generation failed:"):
-                st.error(email)
+        if generate:
+            if not purpose.strip():
+                st.warning("Please enter the purpose of your email.")
 
             else:
-                # Save the email type along with the generated email
-                with open("email_history.txt", "a", encoding="utf-8") as f:
-                    f.write(f"Email Type: {email_type}\n")
-                    f.write(email)
-                    f.write("\n")
-                    f.write("=" * 50)
-                    f.write("\n\n")
-
-                st.success("Email saved to history!")
-                st.success("Email generated successfully!")
-
-                st.subheader("Generated Email")
-
-                st.text_area(
-                    "Output",
-                    email,
-                    height=300,
-                    key="generated_email"
+                email = generate_email(
+                    email_type,
+                    purpose,
+                    context,
+                    tone,
                 )
 
-                st.download_button(
-                    "📥 Download Email",
-                    email,
-                    file_name="generated_email.txt",
-                    mime="text/plain"
-                )
+                # Do not save failed API responses
+                if email.startswith("Email generation failed:"):
+                   st.error(
+                      "Email generation is temporarily unavailable. "
+                     "Please try again later."
+         )
+
+                else:
+                    # Save successful emails to history
+                    with open(
+                        "email_history.txt",
+                        "a",
+                        encoding="utf-8",
+                    ) as f:
+                        f.write(f"Email Type: {email_type}\n")
+                        f.write(email)
+                        f.write("\n")
+                        f.write("=" * 50)
+                        f.write("\n\n")
+
+                    st.success(
+                        "Email generated successfully and saved to history!"
+                    )
+
+                    st.subheader("✉️ Generated Email")
+
+                    # Dark document-style preview
+                    import html
+
+                    formatted_email = html.escape(email).replace(
+                        "\n", "<br>"
+                    )
+
+                    st.markdown(
+                        f"""
+                        <div style="
+                            background-color: #1e2029;
+                            color: #f1f3f5;
+                            padding: 28px 32px;
+                            border-radius: 12px;
+                            border: 1px solid #383b46;
+                            line-height: 1.9;
+                            font-size: 16px;
+                            font-family: Arial, sans-serif;
+                            overflow-wrap: anywhere;
+                            box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+                        ">
+                            {formatted_email}
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                    # Download generated email
+                    st.download_button(
+                        "📥 Download Email",
+                        email,
+                        file_name="generated_email.txt",
+                        mime="text/plain",
+                        use_container_width=True,
+                    )
+
 
 
 # ==========================================
