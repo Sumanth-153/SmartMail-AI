@@ -5,3 +5,4 @@ langchain
 langchain-openai
 langchain-core
 google-genai
+supabase
